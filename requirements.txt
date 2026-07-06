@@ -1,0 +1,2 @@
+flask
+adafruit-circuitpython-dht   # only needed on the actual Raspberry Pi with real hardware

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #1e1e1e;
+            border-radius: 16px;
+            padding: 2rem 3rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .value { font-size: 3rem; font-weight: 600; margin: 0.5rem 0; }
+        .label { font-size: 0.9rem; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+        .timestamp { font-size: 0.8rem; color: #666; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="label">Temperature</div>
+        <div class="value" id="temp">--°C</div>
+        <div class="label">Humidity</div>
+        <div class="value" id="humidity">--%</div>
+        <div class="timestamp" id="timestamp">Waiting for data...</div>
+    </div>
+
+    <script>
+        async function updateReading() {
+            try {
+                const res = await fetch('/api/latest');
+                const data = await res.json();
+                document.getElementById('temp').textContent =
+                    data.temperature_c !== null ? `${data.temperature_c}°C` : '--°C';
+                document.getElementById('humidity').textContent =
+                    data.humidity_pct !== null ? `${data.humidity_pct}%` : '--%';
+                document.getElementById('timestamp').textContent =
+                    data.timestamp ? `Last updated: ${new Date(data.timestamp * 1000).toLocaleTimeString()}` : 'Waiting for data...';
+            } catch (e) {
+                document.getElementById('timestamp').textContent = 'Connection error';
+            }
+        }
+        updateReading();
+        setInterval(updateReading, 2000);  // poll every 2 seconds
+    </script>
+</body>
+</html>
